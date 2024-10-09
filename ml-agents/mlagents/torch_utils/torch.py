@@ -51,15 +51,27 @@ def set_torch_config(torch_settings: TorchSettings) -> None:
 
     _device = torch.device(device_str)
 
+    if _device.type == "mps" and torch.backends.mps.is_available():
+        torch.set_default_device(torch.device("mps"))
+        logger.info(f"default Torch device: {_device}")
+        return
+
+    if _device.type == "mps" and not torch.backends.mps.is_available():
+        logger.warn(
+            "Torch MPS is not available on this device. Defaulting to CPU or CUDA."
+        )
+        _device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
     if _device.type == "cuda":
         torch.set_default_tensor_type(torch.cuda.FloatTensor)
     else:
         torch.set_default_tensor_type(torch.FloatTensor)
     logger.debug(f"default Torch device: {_device}")
+    logger.warn(f"Using device {_device} for Torch operations.")
 
 
 # Initialize to default settings
-set_torch_config(TorchSettings(device=None))
+# set_torch_config(TorchSettings(device=None))
 
 nn = torch.nn
 
