@@ -41,6 +41,8 @@ public class AgentSoccer : Agent
 
     [HideInInspector]
     public Rigidbody agentRb;
+    public Transform headTransform; 
+    public float headRotationSpeed = 100f;
     SoccerSettings m_SoccerSettings;
     BehaviorParameters m_BehaviorParameters;
     public Vector3 initialPos;
@@ -99,12 +101,14 @@ public class AgentSoccer : Agent
     {
         var dirToGo = Vector3.zero;
         var rotateDir = Vector3.zero;
+        var headRotateDir = 0f; // Add head rotation variable
 
         m_KickPower = 0f;
 
         var forwardAxis = act[0];
         var rightAxis = act[1];
         var rotateAxis = act[2];
+        var headRotateAxis = act[3]; // Assuming the 4th action controls the head
 
         switch (forwardAxis)
         {
@@ -137,13 +141,27 @@ public class AgentSoccer : Agent
                 break;
         }
 
+        switch (headRotateAxis)
+        {
+            case 1:
+                headRotateDir = -1f; // Rotate head left
+                break;
+            case 2:
+                headRotateDir = 1f; // Rotate head right
+                break;
+        }
+
+        // Rotate the agent
         transform.Rotate(rotateDir, Time.deltaTime * 100f);
-        agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed,
-            ForceMode.VelocityChange);
+
+        // Rotate the head
+        headTransform.Rotate(Vector3.up, headRotateDir * headRotationSpeed * Time.deltaTime, Space.Self);
+
+        // Apply movement
+        agentRb.AddForce(dirToGo * m_SoccerSettings.agentRunSpeed, ForceMode.VelocityChange);
     }
 
     public override void OnActionReceived(ActionBuffers actionBuffers)
-
     {
 
         if (position == Position.Goalie)
@@ -162,7 +180,8 @@ public class AgentSoccer : Agent
     public override void Heuristic(in ActionBuffers actionsOut)
     {
         var discreteActionsOut = actionsOut.DiscreteActions;
-        //forward
+
+        // Forward movement
         if (Input.GetKey(KeyCode.W))
         {
             discreteActionsOut[0] = 1;
@@ -171,7 +190,8 @@ public class AgentSoccer : Agent
         {
             discreteActionsOut[0] = 2;
         }
-        //rotate
+
+        // Rotation
         if (Input.GetKey(KeyCode.A))
         {
             discreteActionsOut[2] = 1;
@@ -180,7 +200,8 @@ public class AgentSoccer : Agent
         {
             discreteActionsOut[2] = 2;
         }
-        //right
+
+        // Right movement
         if (Input.GetKey(KeyCode.E))
         {
             discreteActionsOut[1] = 1;
@@ -188,6 +209,16 @@ public class AgentSoccer : Agent
         if (Input.GetKey(KeyCode.Q))
         {
             discreteActionsOut[1] = 2;
+        }
+
+        // Head rotation
+        if (Input.GetKey(KeyCode.LeftArrow))
+        {
+            discreteActionsOut[3] = 1; // Rotate head left
+        }
+        if (Input.GetKey(KeyCode.RightArrow))
+        {
+            discreteActionsOut[3] = 2; // Rotate head right
         }
     }
     /// <summary>
