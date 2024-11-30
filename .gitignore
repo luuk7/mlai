@@ -9,6 +9,10 @@
 # Training environments
 /envs
 
+# Training results
+*results/
+*envs/
+
 # Environemnt logfile
 *Project.log
 
