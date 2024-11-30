@@ -26,9 +26,10 @@ public class AgentSoccer : Agent
         Generic
     }
 
-    [HideInInspector]
-    public Team team;
+    [HideInInspector] public Team team;
+
     float m_KickPower;
+
     // The coefficient for the reward for colliding with a ball. Set using curriculum.
     float m_BallTouch;
     public Position position;
@@ -39,8 +40,7 @@ public class AgentSoccer : Agent
     float m_ForwardSpeed;
 
 
-    [HideInInspector]
-    public Rigidbody agentRb;
+    [HideInInspector] public Rigidbody agentRb;
     SoccerSettings m_SoccerSettings;
     BehaviorParameters m_BehaviorParameters;
     public Vector3 initialPos;
@@ -73,6 +73,7 @@ public class AgentSoccer : Agent
             initialPos = new Vector3(transform.position.x + 5f, .5f, transform.position.z);
             rotSign = -1f;
         }
+
         if (position == Position.Goalie)
         {
             m_LateralSpeed = 1.0f;
@@ -88,6 +89,7 @@ public class AgentSoccer : Agent
             m_LateralSpeed = 0.3f;
             m_ForwardSpeed = 1.0f;
         }
+
         m_SoccerSettings = FindObjectOfType<SoccerSettings>();
         agentRb = GetComponent<Rigidbody>();
         agentRb.maxAngularVelocity = 500;
@@ -95,7 +97,7 @@ public class AgentSoccer : Agent
         m_ResetParams = Academy.Instance.EnvironmentParameters;
     }
 
-    public void MoveAgent(ActionSegment<int> act)
+    public virtual void MoveAgent(ActionSegment<int> act)
     {
         var dirToGo = Vector3.zero;
         var rotateDir = Vector3.zero;
@@ -145,7 +147,6 @@ public class AgentSoccer : Agent
     public override void OnActionReceived(ActionBuffers actionBuffers)
 
     {
-
         if (position == Position.Goalie)
         {
             // Existential bonus for Goalies.
@@ -156,6 +157,7 @@ public class AgentSoccer : Agent
             // Existential penalty for Strikers
             AddReward(-m_Existential);
         }
+
         MoveAgent(actionBuffers.DiscreteActions);
     }
 
@@ -167,29 +169,35 @@ public class AgentSoccer : Agent
         {
             discreteActionsOut[0] = 1;
         }
+
         if (Input.GetKey(KeyCode.S))
         {
             discreteActionsOut[0] = 2;
         }
+
         //rotate
         if (Input.GetKey(KeyCode.A))
         {
             discreteActionsOut[2] = 1;
         }
+
         if (Input.GetKey(KeyCode.D))
         {
             discreteActionsOut[2] = 2;
         }
+
         //right
         if (Input.GetKey(KeyCode.E))
         {
             discreteActionsOut[1] = 1;
         }
+
         if (Input.GetKey(KeyCode.Q))
         {
             discreteActionsOut[1] = 2;
         }
     }
+
     /// <summary>
     /// Used to provide a "kick" to the ball.
     /// </summary>
@@ -200,6 +208,7 @@ public class AgentSoccer : Agent
         {
             force = k_Power;
         }
+
         if (c.gameObject.CompareTag("ball"))
         {
             AddReward(.2f * m_BallTouch);
@@ -213,5 +222,4 @@ public class AgentSoccer : Agent
     {
         m_BallTouch = m_ResetParams.GetWithDefault("ball_touch", 0);
     }
-
 }

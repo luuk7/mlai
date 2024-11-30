@@ -4,5 +4,8 @@
 EditorBuildSettings:
   m_ObjectHideFlags: 0
   serializedVersion: 2
-  m_Scenes: []
+  m_Scenes:
+  - enabled: 1
+    path: Assets/ML-Agents/Examples/SoccerNew/Scenes/HeadTurn.unity
+    guid: 71c50824f2f7a4a83a046369eafb1a91
   m_configObjects: {}
