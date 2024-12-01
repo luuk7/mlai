@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace ML_Agents.Examples.SoccerNew.Scripts
 {
-    public class AgentSound : AgentSoccer
+    public class AgentHeadAndSound : AgentSoccerHeadTurn
     {
         private SoccerEnvController m_EnvController;
 
