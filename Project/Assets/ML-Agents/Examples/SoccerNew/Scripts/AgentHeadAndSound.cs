@@ -73,6 +73,7 @@ namespace ML_Agents.Examples.SoccerNew.Scripts
 
             lastFreeIndex += 3;
 
+
             foreach (var playerInfo in agentsList)
             {
                 if (lastFreeIndex + 2 >= observations.Length) break;
