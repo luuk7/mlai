@@ -11,7 +11,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/ML-Agents/Examples/SoccerNew/Scenes/Base.unity
     guid: af8388b8f4b3c420cb03d86135eb3661
-  - enabled: 1
+  - enabled: 0
     path: Assets/ML-Agents/Examples/SoccerNew/Scenes/WatchBall.unity
     guid: 5c8fa958400514821ad5c63e8bc08cbb
+  - enabled: 1
+    path: Assets/ML-Agents/Examples/SoccerNew/Scenes/SoundFixed.unity
+    guid: 325bd458f793af6498beaec901a79952
   m_configObjects: {}
