@@ -1,49 +1,82 @@
-# How to train a model
+# Instructions
 
-## Step 1: Build the game
+## Step 1: Clone the repo and install mlagents (you probably have done this already)
+Run
+```
+git clone https://github.com/luuk7/mlai.git
+cd mlai
+git switch phase-3
+```
+Then follow this guide: https://github.com/Unity-Technologies/ml-agents/blob/develop/docs/Installation.md
+
+TLDR of the guide:
+```
+conda create -n mlagents python=3.10.12 && conda activate mlagents
+pip3 install torch -f https://download.pytorch.org/whl/torch_stable.html
+pip3 install -e ./ml-agents-envs
+pip3 install -e ./ml-agents
+```
+
+## Step 2: Build the game
 
 ### IMPORTANT:
 
-**(SAVE THE RESULT IN `phase2/envs`)**
+**SAVE THE RESULT IN `phase3/envs`**
+
+**ON WINDOWS WHEN YOU BUILD IT WILL ASK YOU TO SELECT A FOLDER TO SAVE IT. YOU SHOULD CREATE IT IN `phase3/envs`. FOR EXAMPLE `phase3/envs/HeadTurn`**
 
 https://unity-technologies.github.io/ml-agents/Learning-Environment-Executable/
 
-## Step 2: Train the model
+## Step 3: Make a conda environment for running the resource monitoring script.
 
-1. Go to the phase2 folder (where this file is located)
-2. You should have save the executable you built in step 1 in the `envs` folder (`phase2/envs`)
-3. Activate the conda environment with `conda activate mlagents`
-4. Run the following command:
+Open a command prompt where you have access to the `conda` command and administrator privileges. (On windows type "Anaconda Powershell Prompt" into the search bar and right-click -> Run as Administrator)
 
-```bash
-mlagents-learn <trainer-config-file> --env=./envs/<env_name> --run-id=<run-identifier> --num-envs=<num-of-game-instances> --no-graphics
+Now run
+```
+conda create --name monitor
+conda activate monitor
+conda install psutil
+conda install -c conda-forge pynvml
 ```
 
-Example:
+## Step 4: Run the training while collecting the resource usage data.
+You need to open two administrator conda prompts in this (`mlai/phase3`) folder. One should have the `mlagents` environment active and the other the `monitor` environment.
 
-```bash
-mlagents-learn ./SoccerTwos.yaml --env=./envs/Base --run-id=base_01  --num-envs=5 --no-graphics
+Prompt 1 example:
+```
+(mlagents) PS C:\dev\mlai\phase3>
 ```
 
-### Notes:
-
-- The value for `--num-envs` should be the number of game instances you want to run in parallel. The value that worked best for me was 5, but this is gonna depend on your machine. There's no limitation, so if you select `100`, for example, it will probably crash your computer.
-- In case you want to replace a previously trained model, you can use the same `run-id` and the flag `--force`.
-- In case you want to continue training a previously trained model, you can use the same `run-id` and the flag `--resume`.
-- To create a new model from an existing one, you can use the `--initialize-from <run-identifier>` flag.
-
-## Step 3: Evaluate the model
-
-Run the following command:
-
-```bash
-tensorboard --logdir results
+Prompt 2 example:
+```
+(monitor) PS C:\dev\mlai\phase3>
 ```
 
-Then open your browser and go to `http://localhost:6006/`. You should see the training results.
+Now in Prompt 1 run:
+```
+mlagents-learn <path to config> --env=<path to built environment> --run-id=<id of the run> --num-envs=<number of environments> --no-graphics
+```
+**IMPORTANT: The \<id of the run\> should clearly indicate which config you are using for the run, I strongly recommend you just use the name of the config file**
 
-## Step 4: Test the model
+**IMPORTANT: Unless you are the person running the number of environments experiments, --num-envs should be =4**
 
-1. Go to the phase2 folder (where this file is located)
-2. Go to `/results/<run-identifier>` and copy the `<behavior-name>.onnx` file to the `Project/Assets/ML-Agents/Examples/SoccerNew/TFModels/` folder. (This path is relative to the repository root.)
-3. Also change the `.onnx` file name in advance, if you don't want to overwrite the existing model.
+Example Prompt 1 command:
+```
+mlagents-learn ./configs/batch_buffer/bs_bs_4096_40960.yaml --env=./envs/HeadTurn --run-id=bs_bs_4096_40960 --num-envs=4 --no-graphics
+```
+
+Finally, in Prompt 2 run:
+```
+python ./monitor_resources.py --run-id=<same run id as for mlagents>
+```
+
+**IMPORTANT: The --run-id must be the same as the one for mlagents**
+
+Example Prompt 2 command:
+```
+python ./monitor_resources.py --run-id=bs_bs_4096_40960
+```
+
+## Step 5: Repeat Step 4 two more times.
+
+You should do Step 4 three times in total, twice for the configs parameter specific configs and once for `./configs/base/SoccerTwos.yaml`
