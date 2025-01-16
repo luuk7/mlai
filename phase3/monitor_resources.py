@@ -64,7 +64,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     output_file = f"results/{args.run_id}/resource_metrics.csv"
-    monitoring_interval = 0.25 # in seconds
+    monitoring_interval = 1 # in seconds
 
     # Check if file exists and prompt before overwriting
     if os.path.exists(output_file):
